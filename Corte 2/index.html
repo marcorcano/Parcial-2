@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ingenieria</title>
+    <!-- Agregar esta sección en el head de tu archivo index.html -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Función para cargar la lista de usuarios
+        function cargarUsuarios() {
+            $.ajax({
+                url: 'api.php',
+                method: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    // Recorre la lista de usuarios y muestra los datos en la tabla
+                    var tablaUsuarios = $('table');
+                    tablaUsuarios.find('tr:gt(0)').remove(); // Limpia la tabla excepto la fila de encabezado
+                    $.each(data, function(index, usuario) {
+                        tablaUsuarios.append(
+                            '<tr>' +
+                            '<td>' + usuario.id + '</td>' +
+                            '<td>' + usuario.nombre + '</td>' +
+                            '<td>' + usuario.email + '</td>' +
+                            '<td>' +
+                            '<button class="editar" data-id="' + usuario.id + '">Editar</button>' +
+                            '<button class="eliminar" data-id="' + usuario.id + '">Eliminar</button>' +
+                            '</td>' +
+                            '</tr>'
+                        );
+                    });
+                }
+            });
+        }
+
+        cargarUsuarios(); // Carga la lista de usuarios al cargar la página
+
+        // Manejo de eventos para crear un nuevo usuario
+        $('form').on('submit', function(e) {
+            e.preventDefault();
+            var nombre = $('#nombre').val();
+            var email = $('#email').val();
+            $.ajax({
+                url: 'api.php',
+                method: 'POST',
+                data: JSON.stringify({ nombre: nombre, email: email }),
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function(data) {
+                    cargarUsuarios(); // Recarga la lista de usuarios después de crear uno nuevo
+                    $('form')[0].reset();
+                }
+            });
+        });
+    });
+</script>
+
+</head>
+<body>
+        
+    <form action="api.php" method="POST">
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" required>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+        <button type="submit">Crear Usuario</button>
+    </form>
+
+    <h2>Lista de Usuarios</h2>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Acciones</th>
+        </tr>
+        <!-- Aquí mostrarás la lista de usuarios obtenida desde la API -->
+    </table>
+</body>
+</html>
